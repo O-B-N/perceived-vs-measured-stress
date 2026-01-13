@@ -1,78 +1,69 @@
-import pandas as pd  # Import pandas for data manipulation. 
-import matplotlib.pyplot as plt  # Import matplotlib for plotting. 
-import seaborn as sns  # Import seaborn for statistical visualization. 
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import logging
 
-def process_and_clean_data(file_path):
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+
+def clean_data_logic(df):
     """
-    Function to load, validate, and clean student health data.
+    Logic for validating and filtering data.
     """
-    # DATA LOADING 
-    df = pd.read_csv(file_path)
-    # We use len() to capture the total number of rows. 
-    # Recording the length before and after filtering ensures data integrity and provides a clear audit trail.
-    initial_count = len(df)
-    
-    # VALIDATION RULES 
     # Check if stress levels are within the logical biological range (0-10).
     valid_stress_biosensor = df['Stress_Level_Biosensor'].between(0, 10)
     valid_stress_self = df['Stress_Level_Self_Report'].between(0, 10)
     
-    # Validate categorical data: Ensure gender is restricted to 'M' or 'F'.
-    # The isin() function filters the data based on a list of allowed values. 
-    # It returns "True" if the value exists in ['M', 'F'], ensuring categorical integrity.
-    valid_gender = df['Gender'].isin(['M', 'F'])
-    
-    # DATA FILTERING 
-    # Combine conditions using bitwise AND (&).
+    # Convert gender strings to uppercase.
+    # This ensures consistency even if the input data has mixed casing.
+    gender_upper = df['Gender'].str.upper()
+    valid_gender = gender_upper.isin(['M', 'F'])
+
+    # Combine all rules into a single mask.
     valid_rows_mask = valid_stress_biosensor & valid_stress_self & valid_gender
     
-    # Apply the Boolean Mask to the DataFrame. 
-    # The mask contains 'True' for rows meeting our criteria and 'False' for those that don't.
-    # We use .copy() to ensure 'df_cleaned' is a separate object in memory, preventing any accidental changes to the original 'df' dataset.
-    df_cleaned = df[valid_rows_mask].copy()
-    
-    # REPORTING RESULTS
-    # Calculate the difference to see how many rows failed the validation.
+    return df[valid_rows_mask].copy()
+
+
+def process_and_clean_data(file_path):
+    """
+    Coordinates loading, cleaning, visualization, and export.
+    """
+    # Load dataset
+    df = pd.read_csv(file_path)
+    initial_count = len(df)
+
+    # Apply cleaning logic
+    df_cleaned = clean_data_logic(df)
     removed_count = initial_count - len(df_cleaned)
-    
-    # Print summary statistics for transparency and verification of the cleaning process.
-    print(f"Initial rows: {initial_count}")
-    print(f"Rows removed (invalid data): {removed_count}")
-    print(f"Cleaned dataset size: {len(df_cleaned)}")
-    
-    # OUTLIER DETECTION & VISUALIZATION
-    # sns (Seaborn) is used for high-level statistical styling.
-    # set_theme(style="whitegrid") provides a clean white background with grid lines. 
-    # to enhance readability and make it easier to track values along the axes.
+
+    # Log results instead of printing
+    logger.info(f"Initial rows: {initial_count}")
+    logger.info(f"Rows removed: {removed_count}")
+    logger.info(f"Cleaned dataset size: {len(df_cleaned)}")
+
+    # Visualize stress distributions
     sns.set_theme(style="whitegrid")
-    
-    # plt (Matplotlib) handles the window of the plot.
-    # figsize=(10, 6) sets the dimensions of the figure in inches (Width=10, Height=6).
-    # figsize=(10, 6) is chosen to maintain an optimal aspect ratio.
-    # This size ensures that labels are legible and the data distribution is clearly visible without being cramped or distorted.
     plt.figure(figsize=(10, 6))
-    
-    # Using a Boxplot to visualize distribution and identify statistical outliers.
-    sns.boxplot(data=df_cleaned[['Stress_Level_Biosensor', 'Stress_Level_Self_Report']])
-    
-    # Set the graph title to explain the content.
+
+    # Selection for plotting.
+    plot_cols = ['Stress_Level_Biosensor', 'Stress_Level_Self_Report']
+    sns.boxplot(data=df_cleaned[plot_cols])
+
     plt.title('Statistical Distribution of Stress Levels')
-    
-    # Label the X-axis to identify the data groups.
     plt.xlabel('Stress Assessment Method')
-    
-    # Label the Y-axis to show the measurement scale.
     plt.ylabel('Measurement Scale (0-10)')
-    
-    # Display the final plot window.
     plt.show()
+
+    # Export cleaned data
+    output_filename = 'cleaned_student_health_data.csv'
+    df_cleaned.to_csv(output_filename, index=False)
     
-    # EXPORTING
-    # Save the finalized cleaned data to a new CSV file for further group analysis.
-    df_cleaned.to_csv('cleaned_student_health_data.csv', index=False)
+    logger.info(f"Process complete. Data saved to: {output_filename}")
     
     return df_cleaned
 
-# RUNNING THE PROCESS
-# Run the cleaning process on the CSV file.
-final_data = process_and_clean_data('student_health_data.csv')
+
+if __name__ == "__main__":
+    process_and_clean_data('student_health_data.csv')
