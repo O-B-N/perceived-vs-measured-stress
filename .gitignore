@@ -1,0 +1,12 @@
+# Ignore the cleaned data files (generated locally).
+cleaned_student_health_data.csv
+test_sample.csv
+
+# Ignore Python cache (compiled files)
+__pycache__/
+*.pyc
+
+# Ignore IDE specific files
+.vscode/
+.DS_Store
+
