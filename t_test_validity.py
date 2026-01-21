@@ -11,7 +11,7 @@ def verify_ttest_assumptions(group1_data: pd.Series, group2_data: pd.Series):
     logger = logging.getLogger(__name__)
     normality = equal_variance = False
 
-    # 1. Check Sample Size or Normality
+    # Check sample size or normality
     n1, n2 = len(group1_data), len(group2_data)
     
     if n1 >= 30 and n2 >= 30:
@@ -27,8 +27,7 @@ def verify_ttest_assumptions(group1_data: pd.Series, group2_data: pd.Series):
         else:
             logger.warning("Normality assumption violated and sample size is small.")
 
-    # 2. Check Equality of Variances (Levene's Test)
-    # H0: Variances are equal. If p > 0.05, we do not reject H0.
+    # Check equality of variances (Levene's Test) If p > 0.05, the variances are equal.
     _, p_levene = stats.levene(group1_data, group2_data)
     if p_levene > 0.05:
         logger.info(f"Equal variance assumption met (Levene's p = {p_levene:.4f}).")
