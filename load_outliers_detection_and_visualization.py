@@ -36,6 +36,8 @@ def total_daily_load_boxplot(df,gender_col,load_col,male_label,female_label):
     plt.title("Combined Daily load by Gender")
     plt.show()
 
+
+
 def Total_daily_load_outliers(df,gender_col,load_col):
     for col in [gender_col, load_col]:
         if col not in df.columns:
