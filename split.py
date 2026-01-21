@@ -37,7 +37,7 @@ def standardize_gender_column(df: pd.DataFrame) -> pd.DataFrame:
     choices = ['Male', 'Female']
 
     # 4. Create a new standardized column
-    df_clean['standardized_gender'] = np.select(conditions, choices, default=None)
+    df_clean['standardized_gender'] = np.select(conditions, choices, default=np.nan)
 
     # Log how many were classified
     counts = df_clean['standardized_gender'].value_counts()
@@ -49,7 +49,7 @@ def standardize_gender_column(df: pd.DataFrame) -> pd.DataFrame:
     return df_clean
 
 
-def get_gender_series(df: pd.DataFrame, target_col: str, gender_col: str) -> tuple:
+def get_gender_series(df: pd.DataFrame, target_col: str, gender_col: str, group_keys: dict) -> tuple:
     """
     Splits the data into two Series (groups) using groupby, based on specific column names.
     
@@ -66,16 +66,18 @@ def get_gender_series(df: pd.DataFrame, target_col: str, gender_col: str) -> tup
     """
     # 1. Validation: Ensure columns exist in the DataFrame
     if target_col not in df.columns or gender_col not in df.columns:
-        logger.error(f"Missing one or more target columns in the dataset: {e}. Check standardization.")
+        logger.error(f"Columns {target_col} or {gender_col} not found in DataFrame.")
         return None, None
 
     # 2. Create a GroupBy object: Group by gender, but select only the target column (returns SeriesGroupBy)
+    # This is more memory efficient than grouping the entire dataframe if we only need one column.
     grouped = df.groupby(gender_col)[target_col]
     
     try:
         # 3. Extract the specific Series for each group using the provided keys
-        male_series = grouped.get_group('M')
-        female_series = grouped.get_group('F')
+        # We use .get_group() to retrieve the specific Series for 'Male' and 'Female'
+        male_series = grouped.get_group(group_keys['male'])
+        female_series = grouped.get_group(group_keys['female'])
         
         logger.info(f"Successfully split groups: Male count={len(male_series)}, Female count={len(female_series)}")
         return male_series, female_series
