@@ -2,8 +2,13 @@ import pandas as  pd
 import numpy as np
 from scipy import stats
 import pingouin as pg
+import genders as g
+import logging
 
-def remove_col_outliers(df,df_column): 
+logger= logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
+def outliers_IQR(df,df_column): 
     Q1 = df[df_column].quantile(0.25) #Lower quartile
     Q3 = df[df_column].quantile(0.75) #Upper quartile
     IQR = Q3 - Q1
@@ -21,45 +26,41 @@ def remove_col_outliers(df,df_column):
 
 
 
-
-def independent_t_test(male_diff_series,female_diff_series):
+def independent_t_test(df, diff_col, gender_col, male_label,female_label):
+    male_diff_series = df.loc[df[gender_col] == male_label, diff_col] 
+    female_diff_series = df.loc[df[gender_col] == female_label, diff_col]
     t_stat, p_val = stats.ttest_ind(male_diff_series, female_diff_series)
-    if (p_val > 0.05):
-        print("Fail to reject null hypothesis: No significant difference between groups.")
-        return t_stat, p_val, None
+
+    return t_stat, p_val
+
+
+
+def conclusion_ttest_ind(t_stat,p_val): #two- tailed test!!!
+    if p_val<0.05:
+        logger.info("The results were statistically significant at the 0.05 level.")
+    else:
+        logger.info("The results were not statistically significant at the 0.05 level.")
+        if p_val<0.1:
+            logger.info("The results were statistically significant at the 0.1 level.")
+        else:
+            logger.info("The results were not statistically significant at the 0.1 level.")    
+
+
+def effect_size(df, diff_col, gender_col, male_label,female_label):
+    male_diff_series= df.loc[df[gender_col] == male_label, diff_col] 
+    female_diff_series= df.loc[df[gender_col] == female_label, diff_col]
     effect_size=pg.compute_effsize(male_diff_series, female_diff_series)
-    return t_stat, p_val, effect_size
+    return effect_size
 
 
 
 def conclusion_effect(effect_size):
     effect_size_abs=abs(effect_size)
     if effect_size_abs<0.2:
-        print("No effect")
+        logger.info("No effect")
     elif 0.2<=effect_size_abs<0.5:
-        print("Weak effect of "+str(effect_size)) 
+        logger.info("Weak effect of "+str(effect_size)) 
     elif 0.5<=effect_size_abs<0.8:
-        print("Medium effect of "+str(effect_size))   
+        logger.info("Medium effect of "+str(effect_size))   
     else:
-        print("Strong effect of "+str(effect_size))        
-
-
-
-
-
-
-        
-
-    
-
-
-
-
-    
-
-
-
-
-
-    
-
+        logger.info("Strong effect of "+str(effect_size))
