@@ -2,7 +2,6 @@ import pandas as  pd
 import numpy as np
 from scipy import stats
 import pingouin as pg
-import genders as g
 import logging
 
 logger= logging.getLogger(__name__)
@@ -63,4 +62,25 @@ def conclusion_effect(effect_size):
     elif 0.5<=effect_size_abs<0.8:
         logger.info("Medium effect of "+str(effect_size))   
     else:
-        logger.info("Strong effect of "+str(effect_size))
+        logger.info("Strong effect of "+str(effect_size))        
+
+
+
+
+
+
+        
+
+    
+
+
+
+
+    
+
+
+
+
+
+    
+
