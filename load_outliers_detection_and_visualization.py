@@ -2,7 +2,12 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import T_test as tt
+import logging
 
+
+logger= logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 def total_daily_load_boxplot(df,gender_col,load_col,male_label,female_label):
@@ -22,7 +27,7 @@ def total_daily_load_boxplot(df,gender_col,load_col,male_label,female_label):
         raise ValueError("There are not enough numerical values to draw a boxplot.")
 
     if series_women_men_count.min() < 20: #If there are least than 20 numerical load values for men/women - send a message and draw
-        print("Pay attention: Not enough numeric values are available for at least one gender.")
+        logger.info("Pay attention: Not enough numeric values are available for at least one gender.")
 
 
     sns.boxplot(x=gender_col,y=load_col,data=clean_sub_df_gender_load) #Plot box for each gender
@@ -38,7 +43,7 @@ def Total_daily_load_outliers(df,gender_col,load_col):
     df_copy=df.copy()
     list_df=[]
     for gender, df_for_gender in df_copy.groupby(gender_col): #Loop over each gender group from df
-        list_df.append(outliers_IQR(df_for_gender,load_col)) # Remove outliers from the current gender group using the IQR method
+        list_df.append(tt.outliers_IQR(df_for_gender,load_col)) # Remove outliers from the current gender group using the IQR method
     return pd.concat(list_df, axis=0)
 
 
