@@ -4,85 +4,99 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
-def standardize_gender_column(df: pd.DataFrame) -> pd.DataFrame:
+import pandas as pd
+import numpy as np
+import logging
+
+# Setup logger for the example
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
+import pandas as pd
+import numpy as np
+import logging
+
+# Setup a basic logger for demonstration
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def standardize_categorical_column(
+    df: pd.DataFrame, 
+    candidate_cols: list[str], 
+    category_mapping: dict[str, list[str]], 
+    output_col_name: str = 'standardized_col'
+) -> pd.DataFrame | None:
     """
-    Identifies the gender/sex column, standardizes values to 'Male'/'Female',
-    and returns a cleaned DataFrame.
-    
-    Handles:
-    - Column names: 'gender', 'sex' (case insensitive).
-    - Values: 'm', 'male', 'man', '1' -> 'Male'.
-    - Values: 'f', 'female', 'woman', '0' -> 'Female'.
+    Generalizes column standardization by accepting dynamic column names and mapping rules.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        candidate_cols (list[str]): A list of potential column names to search for (case-insensitive).
+        category_mapping (dict[str, list[str]]): A dictionary mapping the desired output value 
+                                                 to a list of possible input variations.
+                                                 Example: {'Male': ['m', 'male', '1']}
+        output_col_name (str): The name of the new standardized column.
+
+    Returns:
+        pd.DataFrame: Cleaned DataFrame with the new standardized column, 
+                      or None if the target column is not found.
     """
-    df_clean = df.copy()
+    new_df = df.copy()
+
+    # 1. Identify the target column dynamically
+    # Create a set of lowercased candidates for fast lookup
+    candidates_lower = {c.lower() for c in candidate_cols}
     
-    # 1. Identify the gender column dynamically
-    gender_col = next((col for col in df.columns if col.lower() in ['gender', 'sex']), None)
-    
-    if not gender_col:
-        logger.error("No 'gender' or 'sex' column found in the dataset.")
+    # Find the first column in the DF that matches one of the candidates
+    target_col = next((col for col in df.columns if col.lower() in candidates_lower), None)
+
+    if not target_col:
+        logger.error(f"None of the candidate columns {candidate_cols} found in the dataset.")
         return None
 
-    logger.info(f"Found gender column: '{gender_col}'")
+    logger.info(f"Found target column: '{target_col}'")
 
-    # 2. Normalize to lowercase and strip whitespace for robust matching
-    # Convert to string first to handle numeric 1/0 inputs gracefully
-    s = df_clean[gender_col].astype(str).str.strip().str.lower()
+    # 2. Prepare the lookup dictionary (Flatten the category_mapping)
+    # This converts {'Male': ['m', '1']} into {'m': 'Male', '1': 'Male'} for faster mapping
+    lookup_map = {}
+    for standard_val, variations in category_mapping.items():
+        for var in variations:
+            # Convert variation to string and lowercase to ensure robust matching
+            lookup_map[str(var).lower().strip()] = standard_val
 
-    # 3. Define conditions
-    conditions = [
-        s.isin(['m', 'male', 'man', '1']),
-        s.isin(['f', 'female', 'woman', '0'])
-    ]
-    choices = ['Male', 'Female']
+    # 3. Normalize input data
+    # Convert column values to string, strip whitespace, and lowercase
+    raw_series = new_df[target_col].astype(str).str.strip().str.lower()
 
-    # 4. Create a new standardized column
-    df_clean['standardized_gender'] = np.select(conditions, choices, default=np.nan)
+    # 4. Map values using the lookup dictionary
+    new_df[output_col_name] = raw_series.map(lookup_map)
 
-    # Log how many were classified
-    counts = df_clean['standardized_gender'].value_counts()
-    logger.info(f"Gender standardization complete. Counts: {counts.to_dict()}")
+    # Log results
+    counts = new_df[output_col_name].value_counts()
+    logger.info(f"Standardization complete for '{output_col_name}'. Counts: {counts.to_dict()}")
 
-    # Drop rows where gender could not be determined
-    df_clean = df_clean.dropna(subset=['standardized_gender'])
-    
-    return df_clean
+    # 5. Drop rows where the value could not be standardized (optional, based on original logic)
+    # If mapping resulted in NaN, it means the value wasn't in our rules
+    new_df = new_df.dropna(subset=[output_col_name])
 
+    return new_df
 
-def get_gender_series(df: pd.DataFrame, target_col: str, gender_col: str, group_keys: dict) -> tuple:
+def get_gender_series(df: pd.DataFrame, target_col: str, gender_col: str) -> tuple:
     """
-    Splits the data into two Series (groups) using groupby, based on specific column names.
-    
-    Args:
-        df (pd.DataFrame): The dataset containing the data.
-        target_col (str): The name of the column containing the metric to analyze (e.g., 'pressure_diff').
-        gender_col (str): The name of the column containing gender labels (e.g., 'standardized_gender').
-        group_keys (dict): A dictionary mapping logical groups to actual values in the dataframe.
-                           Example: {'male': 'Male', 'female': 'Female'}
-                           
-    Returns:
-        tuple: (male_series, female_series) - Two pandas Series objects containing the values of target_col.
-               Returns (None, None) if a group key is missing in the data.
+    Splits the data into Male ('M') and Female ('F') Series based on the target column.
     """
-    # 1. Validation: Ensure columns exist in the DataFrame
+    # 1. Validation: specific columns must exist
     if target_col not in df.columns or gender_col not in df.columns:
-        logger.error(f"Columns {target_col} or {gender_col} not found in DataFrame.")
+        logger.error(f"Missing columns: {target_col} or {gender_col}")
         return None, None
 
-    # 2. Create a GroupBy object: Group by gender, but select only the target column (returns SeriesGroupBy)
-    # This is more memory efficient than grouping the entire dataframe if we only need one column.
-    grouped = df.groupby(gender_col)[target_col]
-    
-    try:
-        # 3. Extract the specific Series for each group using the provided keys
-        # We use .get_group() to retrieve the specific Series for 'Male' and 'Female'
-        male_series = grouped.get_group(group_keys['male'])
-        female_series = grouped.get_group(group_keys['female'])
-        
-        logger.info(f"Successfully split groups: Male count={len(male_series)}, Female count={len(female_series)}")
-        return male_series, female_series
+    # 2. Extract Series using boolean indexing (faster and cleaner than groupby)
+    male_series = df.loc[df[gender_col] == 'M', target_col]
+    female_series = df.loc[df[gender_col] == 'F', target_col]
 
-    except KeyError as e:
-        # This handles cases where one gender might be completely missing from the data
-        logger.error(f"Group key not found in the dataset: {e}. Check standardization.")
+    # 3. Validation: Ensure both groups have data
+    if male_series.empty or female_series.empty:
+        logger.warning("One of the gender groups is empty.")
         return None, None
+
+    return male_series, female_series
