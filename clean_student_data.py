@@ -43,19 +43,6 @@ def process_and_clean_data(file_path):
     logger.info(f"Rows removed: {removed_count}")
     logger.info(f"Cleaned dataset size: {len(df_cleaned)}")
 
-    # Visualize stress distributions
-    sns.set_theme(style="whitegrid")
-    plt.figure(figsize=(10, 6))
-
-    # Selection for plotting.
-    plot_cols = ['Stress_Level_Biosensor', 'Stress_Level_Self_Report']
-    sns.boxplot(data=df_cleaned[plot_cols])
-
-    plt.title('Statistical Distribution of Stress Levels')
-    plt.xlabel('Stress Assessment Method')
-    plt.ylabel('Measurement Scale (0-10)')
-    plt.show()
-
     # Export cleaned data
     output_filename = 'cleaned_student_health_data.csv'
     df_cleaned.to_csv(output_filename, index=False)
@@ -63,6 +50,20 @@ def process_and_clean_data(file_path):
     logger.info(f"Process complete. Data saved to: {output_filename}")
     
     return df_cleaned
+
+def visualize_data_distribution(df):
+    # Visualize stress distributions
+    sns.set_theme(style="whitegrid")
+    plt.figure(figsize=(10, 6))
+
+    # Selection for plotting.
+    plot_cols = ['Stress_Level_Biosensor', 'Stress_Level_Self_Report']
+    sns.boxplot(data=df[plot_cols])
+
+    plt.title('Statistical Distribution of Stress Levels')
+    plt.xlabel('Stress Assessment Method')
+    plt.ylabel('Measurement Scale (0-10)')
+    plt.show()
 
 
 if __name__ == "__main__":

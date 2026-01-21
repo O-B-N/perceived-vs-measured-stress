@@ -25,7 +25,7 @@ def outliers_IQR(df,df_column):
 
 
 
-def independent_t_test(df, diff_col="Diff", gender_col="Gender", male_label="M",female_label="F"):
+def independent_t_test(df, diff_col, gender_col, male_label,female_label):
     male_diff_series = df.loc[df[gender_col] == male_label, diff_col] 
     female_diff_series = df.loc[df[gender_col] == female_label, diff_col]
     t_stat, p_val = stats.ttest_ind(male_diff_series, female_diff_series)
@@ -45,7 +45,7 @@ def conclusion_ttest_ind(t_stat,p_val): #two- tailed test!!!
             logger.info("The results were not statistically significant at the 0.1 level.")    
 
 
-def effect_size(df, diff_col="Diff", gender_col="Gender", male_label="M",female_label="F"):
+def effect_size(df, diff_col, gender_col, male_label,female_label):
     male_diff_series= df.loc[df[gender_col] == male_label, diff_col] 
     female_diff_series= df.loc[df[gender_col] == female_label, diff_col]
     effect_size=pg.compute_effsize(male_diff_series, female_diff_series)
