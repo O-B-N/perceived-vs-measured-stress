@@ -1,3 +1,7 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
 def process_and_visualize_load(df):
     activity_mapping = {
         'LOW': 1.0,

@@ -25,11 +25,11 @@ if __name__ == "__main__":
     }
 
     df_cleaned = csd.process_and_clean_data(FILE_NAME)
-    df_cleaned = g.standardize_column(
+    df_cleaned = g.standardize_categorical_column(
     df_cleaned, 
-    candidate_cols=gender_cols, 
-    category_mapping=gender_rules, 
-    output_col_name='std_gender'
+    gender_cols, 
+    gender_rules, 
+    GENDER_COL
 )
     csd.visualize_data_distribution(df_cleaned)
 
