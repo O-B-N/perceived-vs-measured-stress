@@ -64,6 +64,29 @@ def process_and_clean_data(file_path):
     
     return df_cleaned
 
+    
+def complete_df_without_outliers(df):
+    numeric_cols= df.select_dtypes(include="number").columns
+    if len(numeric_cols) == 0:
+        raise ValueError("No numeric columns found in DataFrame.")
+
+    outlier_info_dict= {}
+
+    for col in numeric_cols:
+        Q1= df[col].quantile(0.25)
+        Q3= df[col].quantile(0.75)
+        IQR= Q3 - Q1
+
+        lower_lim = Q1 - 1.5 * IQR
+        upper_lim = Q3 + 1.5 * IQR
+
+        outlier_info_dict[col]= (df[col] < lower_lim) | (df[col] > upper_lim)
+
+    outlier_df= pd.DataFrame(outlier_info_dict) #Boolean df with "True" on outliers
+    rows_with_outliers_series= outlier_df.any(axis=1) #If there is even one outliers in a row- is marked "True"
+    df_clean = df[~rows_with_outliers_series]
+
+    return df[rows_with_outliers_series],df_clean
 
 if __name__ == "__main__":
     process_and_clean_data('student_health_data.csv')
