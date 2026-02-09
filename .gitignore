@@ -7,6 +7,8 @@ __pycache__/
 *.pyc
 
 # Ignore IDE specific files
-.vscode/
 .DS_Store
+.vs
+
+test.py
 
