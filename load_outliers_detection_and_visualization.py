@@ -50,7 +50,7 @@ def Total_daily_load_outliers(df,gender_col,load_col):
 
 
 
-def status_image(df_without_outliers,gender_col, male_label,female_label,stress_col,load_col):
+def plot_stress_vs_load(df_without_outliers,gender_col, male_label,female_label,stress_col,load_col):
     females_rows_df = df_without_outliers[df_without_outliers[gender_col] == female_label]  # Df with Females rows
     males_rows_df = df_without_outliers[df_without_outliers[gender_col] == male_label] #Df with Males rows
     females_and_males_two_df= [females_rows_df,males_rows_df] #List with df of Females and df of Males
