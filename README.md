@@ -38,8 +38,17 @@ The project follows a modular functional approach:
 
 3.  Execute the main script:
 
-```python main.py
+```
+python main.py
 
+```
+
+### Tests
+
+To run the tests:
+
+```
+python run_all_tests.py
 ```
 
 ### Dataset
@@ -59,7 +68,3 @@ Verma, R., Balhara, Y. P. S., & Gupta, C. S. (2011). Gender differences in stres
 Zintel, S., Schmidt, L. I., Neubauer, A. B., Stoffel, M., Rafiee, Y., Ditzen, B., & Sieverding, M. (2025). Daily sex differences in stress and cortisol: The role of gender-related variables. Psychoneuroendocrinology, 174, 107310. https://www.sciencedirect.com/science/article/pii/S0306453025002033
 
 קדמון, א. (2025, 27 בינואר). לחץ דם גבוה ולחץ דם תקין. שירותי בריאות כללית. https://www.clalit.co.il/he/medical/medical_diagnosis/Pages/hypertension.aspx
-
-```
-
-```

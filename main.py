@@ -4,7 +4,7 @@ import logging
 import physio_pca_kmeans as ppk
 import clean_student_data as csd
 import difference_calculation as dc
-import genders as g
+import standardization as g
 import activity_load_process as alp
 import interaction_regression as ir
 import load_outliers_detection_and_visualization as lov
@@ -45,7 +45,7 @@ import pandas as pd
 # Import your modules
 import clean_student_data as csd
 import difference_calculation as dc
-import genders as g
+import standardization as g
 import activity_load_process as alp
 import interaction_regression as ir
 import load_outliers_detection_and_visualization as lov

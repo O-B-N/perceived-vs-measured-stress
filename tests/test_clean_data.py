@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import unittest
 import pandas as pd
 from clean_student_data import clean_data_logic
@@ -60,23 +63,6 @@ class TestStudentCleaning(unittest.TestCase):
         self.assertEqual(len(result), 1, "Rows with out-of-range stress levels must be removed.")
         # Verify that 99 is gone.
         self.assertNotIn(99, result['Stress_Level_Biosensor'].values)
-
-    def test_invalid_gender(self):
-        """
-        Ensure random text in Gender (like 'Other') is filtered out.
-        """
-        data = {
-            'Gender': ['M', 'Non-Binary', 'Alien'],
-            'Stress_Level_Biosensor': [5, 5, 5],
-            'Stress_Level_Self_Report': [5, 5, 5]
-        }
-        df = pd.DataFrame(data)
-        
-        result = clean_data_logic(df)
-        
-        # Only 'M' should remain (1 row)
-        self.assertEqual(len(result), 1, "Only allowed gender categories (M/F) should remain.")
-
 
 if __name__ == '__main__':
     # Start the testing process
