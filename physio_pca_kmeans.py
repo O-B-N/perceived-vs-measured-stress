@@ -209,25 +209,3 @@ def plot_post_hoc(df):
     plt.legend(title="Sleep Quality")
     plt.tight_layout()
     plt.show()
-
-#########################################################################################
-def main():
-    df = load_data()
-    X, physio_features = select_physiological_features(df)
-    X_scaled_df = standardize_features(df, X, physio_features)
-
-    pca, X_pca, explained_variance, loadings = run_pca(X_scaled_df, physio_features)
-    plot_pca_variance(explained_variance)
-
-    inertia, K_range = elbow_method_kmeans(X_scaled_df)
-
-    df, kmeans, cluster_means = run_final_kmeans(df, X_scaled_df, physio_features, k_final=3)
-
-    post_hoc_comparisons(df)
-    plot_post_hoc(df)
-
-    logger.info("Done.")
-
-
-if __name__ == "__main__":
-    main()
