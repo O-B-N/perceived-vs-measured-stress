@@ -9,10 +9,10 @@ This project investigates the correlation between self-reported stress levels an
 The project follows a modular functional approach:
 
 - `main.py`: The entry point orchestrating data loading, cleaning, and analysis stages.
-- `clean_student_data.py` & `genders.py`: Modules for data preprocessing, outlier removal, and categorical standardization.
+- `clean_student_data.py` & `standardization.py`: Modules for data preprocessing, outlier removal, and categorical standardization.
 - `difference_calculation.py` & `activity_load_process.py`: Feature engineering modules.
 - `t_test.py`, `interaction_regression.py`, `physio_pca_kmeans.py`: Statistical and ML analysis modules.
-- `load_outliers...py`: Visualization helpers.
+- `load_outliers_detection_and_visualization.py`: Visualization helpers.
 
 ## Key Stages
 
