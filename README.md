@@ -13,6 +13,8 @@ The project follows a modular functional approach:
 - `difference_calculation.py` & `activity_load_process.py`: Feature engineering modules.
 - `t_test.py`, `interaction_regression.py`, `physio_pca_kmeans.py`: Statistical and ML analysis modules.
 - `load_outliers_detection_and_visualization.py`: Visualization helpers.
+- `tests`: folder with unit tests
+- `run_all_tests.py`: to run all tests
 
 ## Key Stages
 
