@@ -1,3 +1,7 @@
+# Project Name: Perceived vs Measured Stress Analysis
+# Python Version: 3.9+
+
+# Core Dependencies
 pandas
 numpy
 matplotlib
@@ -5,3 +9,7 @@ seaborn
 scipy
 statsmodels
 pingouin
+scikit-learn
+
+# Development Dependencies
+pytest>=7.0.0
