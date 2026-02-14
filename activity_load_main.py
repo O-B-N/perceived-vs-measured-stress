@@ -36,8 +36,23 @@ if __name__ == "__main__":
     GENDER_COL
 )
 
-    df = alp.process_and_visualize_load(df)
-    df_no_outliers = lov.Total_daily_load_outliers(df, GENDER_COL, COMBINED_LOAD_COL)
+    out, df_cleaned = csd.complete_df_without_outliers(df)
+
+    print(f"Removed {len(out)} outliers based on IQR method.")
+    print(f"{(out)}")
+    condition_mask = df_cleaned['Blood_Pressure_Systolic'] < df_cleaned['Blood_Pressure_Diastolic']
+    df_removed = df_cleaned[condition_mask]
+    df_cleaned = df_cleaned[~condition_mask]
+
+
+    print(f"Removed {len(df_removed)} outliers based on IQR method.")
+    print(f"{(df_removed)}")
+
+    print(f"{len(df_cleaned)}")
+    df_cleaned = alp.process_and_visualize_load(df_cleaned)
+    df_no_outliers = lov.Total_daily_load_outliers(df_cleaned, GENDER_COL, COMBINED_LOAD_COL)
+    
+    print(f"{len(df_cleaned)}")
     lov.total_daily_load_boxplot(df_no_outliers, GENDER_COL, COMBINED_LOAD_COL, MALE_LABEL, FEMALE_LABEL)
     lov.status_image(df_no_outliers, GENDER_COL, MALE_LABEL, FEMALE_LABEL, STRESS_BIO_COL, COMBINED_LOAD_COL)
     model = ir.run_interaction_regression(

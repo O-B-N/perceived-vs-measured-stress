@@ -60,18 +60,18 @@ def visualize_data_distribution(df):
     plot_cols = ['Stress_Level_Biosensor', 'Stress_Level_Self_Report']
     sns.boxplot(data=df[plot_cols])
 
-    plt.title('Statistical Distribution of Stress Levels')
+    plt.title('Comparison of Stress Levels: Biosensor vs. Self-Report')
     plt.xlabel('Stress Assessment Method')
     plt.ylabel('Measurement Scale (0-10)')
     plt.show()
 
     # Export cleaned data
     output_filename = 'cleaned_student_health_data.csv'
-    df_cleaned.to_csv(output_filename, index=False)
+    df.to_csv(output_filename, index=False)
     
     logger.info(f"Process complete. Data saved to: {output_filename}")
     
-    return df_cleaned
+    return df
 
     
 def complete_df_without_outliers(df):

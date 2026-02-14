@@ -24,7 +24,7 @@ def plot_interaction(df, x_col, y_col, group_col):
     sns.lmplot(x=x_col, y=y_col, hue=group_col, data=df, height=6, aspect=1.5)
     plt.subplots_adjust(top=0.9)
     
-    plt.title(f'Interaction Effect: Does {group_col} change how {x_col} affects {y_col}?')
+    plt.title(f'Interaction Effect: Does the gender affects change how combined weekly load affects biosensor stress?')
     plt.show()
 
 def check_regression_assumptions(model):
